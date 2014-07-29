@@ -9,7 +9,7 @@
 import uuid
 import logging
 
-from jsonserver import JSONServer
+from .jsonserver import JSONServer
 
 
 class JSONDocument(object):
