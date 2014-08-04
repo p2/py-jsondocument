@@ -119,9 +119,17 @@ class JSONDocument(object):
 		
 		srv = self.assureServer()
 		doc = srv.loadDocument(self.bucket, self.id)
+		self.updateWith(doc)
+	
+	def updateWith(self, doc):
+		""" Update the receiver's contents with the supplied document (dict).
+		"""
 		if doc is not None:
 			for key, val in doc.items():
-				setattr(self, key, val)
+				try:
+					setattr(self, key, val)
+				except Exception as e:
+					raise Exception("Failed to set attribute \"{}\": {}".format(key, e))
 	
 	@classmethod
 	def insert(cls, documents):
