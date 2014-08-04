@@ -6,17 +6,21 @@
 #	2014-02-05	Created by Pascal Pfiffner
 #
 
+import sys
+import os.path
+sys.path.insert(0, os.path.dirname(__file__))
+
 import uuid
 import logging
 
-from .jsonserver import JSONServer
+from jsonserver import JSONServer
 
 
 class JSONDocument(object):
 	""" Base class for documents living in a NoSQL database.
 	
 	Can be hooked up to JSONServer subclasses, currently designed to work with
-	MongoDB but stubs exist for a Couchbaseimplementation.
+	MongoDB but stubs exist for a Couchbase implementation.
 	"""
 	
 	server = None
