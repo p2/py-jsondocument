@@ -10,6 +10,6 @@ Checkout
 --------
 
 ```bash
-git checkout git@github.com:p2/py-jsondocument.git jsondocument
+git clone git@github.com:p2/py-jsondocument.git jsondocument
 ```
 

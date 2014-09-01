@@ -178,3 +178,27 @@ class JSONDocument(object):
 		
 		return found
 
+
+def updateDictionaryByKeyPath(dictionary, keypath, value):
+	""" Update value at ``keypath``, making sure the dictionary has all the
+	entries needed. If :param:`dictionary` is not a dict it creates a dict
+	with :param:`dictionary` as key and ``1`` as value.
+	"""
+	if dictionary is None:
+		dictionary = {}
+	elif type(dictionary) != dict:
+		dictionary = {dictionary: 1}
+	
+	paths = keypath.split('.')
+	if len(paths) > 0:
+		dd = dictionary
+		last = paths.pop()
+		for key in paths:
+			if key not in dd or type(dd[key]) != dict:
+				dd[key] = {}
+			dd = dd[key]
+		
+		dd[last] = value
+	
+	return dictionary
+
