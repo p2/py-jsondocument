@@ -6,9 +6,10 @@
 #	2014-03-25	Created by Pascal Pfiffner
 
 import os
-import .jsonserver
+
 from pymongo import MongoClient
 from bson.objectid import ObjectId 
+from jsondocument import jsonserver
 
 
 class MongoServer(jsonserver.JSONServer):

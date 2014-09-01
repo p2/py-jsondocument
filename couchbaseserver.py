@@ -5,8 +5,8 @@
 #
 #	2014-03-25	Created by Pascal Pfiffner
 
-import .jsonserver
 from couchbase import Couchbase
+from jsondocument import jsonserver
 
 
 class CouchbaseServer(jsonserver.JSONServer):
