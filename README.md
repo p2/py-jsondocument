@@ -13,3 +13,11 @@ Checkout
 git clone git@github.com:p2/py-jsondocument.git jsondocument
 ```
 
+Unit Tests
+----------
+
+Since jsondocument is usually used as a module, run these tests from one level up, like so:
+
+```bash
+python -m unittest jsondocument/jsondocument_test.py
+```

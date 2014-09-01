@@ -13,14 +13,14 @@ sys.path.insert(0, os.path.dirname(__file__))
 import uuid
 import logging
 
-from jsonserver import JSONServer
+from jsondocument.jsonserver import JSONServer
 
 
 class JSONDocument(object):
 	""" Base class for documents living in a NoSQL database.
 	
-	Can be hooked up to JSONServer subclasses, currently designed to work with
-	MongoDB but stubs exist for a Couchbase implementation.
+	Can be hooked up to JSONServer subclasses, which can represent a MongoDB or
+	Couchbase server, or can be simple file or memory "databases".
 	"""
 	
 	server = None
@@ -82,30 +82,29 @@ class JSONDocument(object):
 	# -------------------------------------------------------------------------- Server
 	@classmethod
 	def assureServerClass(cls):
-		if JSONDocument.server is None:
+		if cls.server is None:
 			raise Exception("I don't yet have a handle to the server in {}".format(cls))
 		if cls.use_bucket is None:
 			raise Exception("I don't yet have a bucket to use for class {}".format(cls))
-		return JSONDocument.server
+		return cls.server
 
 	def assureServer(self):
 		return self.__class__.assureServerClass()
 	
 	@classmethod
-	def hookup(cls, jsonserver=None, bucket=None):
+	def hookup(cls, jsonsrv=None, bucket=None):
 		""" Sets the bucket/collection to use for instances of this class.
 		
-		:param JSONServer jsonserver: The JSONServer instance to hook it up to;
-			this will ALWAYS hook up to JSONDocument, not the subclass! Is this
-			good? Not sure, but convenient.
+		:param JSONServer jsonsrv: The JSONServer instance to hook this class
+			up to
 		:param str bucket: The bucket/database name to use
 		"""
-		if cls.server is None and jsonserver is None:
+		if cls.server is None and jsonsrv is None:
 			raise Exception('Need a JSONServer instance')
-		if jsonserver is not None:
-			if not isinstance(jsonserver, JSONServer):
-				raise Exception('Need a JSONServer instance but got {}'.format(jsonserver))
-			JSONDocument.server = jsonserver
+		if jsonsrv is not None:
+			if not isinstance(jsonsrv, JSONServer):
+				raise Exception('Need a JSONServer instance but got {} > {}'.format(jsonsrv, jsonsrv.__class__.__bases__))
+			cls.server = jsonsrv
 		
 		if bucket is not None and len(bucket) > 0:
 			cls.use_bucket = bucket

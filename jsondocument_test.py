@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#  Since jsondocument is usually used as a module, run these tests from one
+#  level up, with:
+#      python -m unittest jsondocument/jsondocument_test.py
+
 import unittest
-import jsondocument as jsondoc
-import jsonserver as jsonsrv
+import jsondocument.jsondocument as jsondoc
+import jsondocument.jsonserver as jsonsrv
 
 
 class TestJSONDocument(unittest.TestCase):
