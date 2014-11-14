@@ -70,13 +70,21 @@ class JSONDocument(object):
 	def id(self):
 		return self._id
 	
-	@property
-	def json(self):
+	def as_json(self):
+		""" Return the whole document ready to be JSONified. """
 		return self.__dict__
 	
-	@property
-	def api(self):
+	def for_api(self):
+		""" Return the whole OR PARTS OF the receiver, as JSON, to be consumed
+		by an API. """
 		return self.__dict__
+	
+	def __html__(self):
+		""" For compatibility with other libraries, forwards to `for_api()`.
+		
+		This is implemented for Genshi and Django, but most importantly Jinja
+		and thus Flask. """
+		return self.for_api()
 	
 	
 	# -------------------------------------------------------------------------- Server
@@ -150,7 +158,7 @@ class JSONDocument(object):
 		""" Store the document.
 		"""
 		srv = self.assureServer()
-		doc_id = srv.storeDocument(self.bucket, self.json)
+		doc_id = srv.storeDocument(self.bucket, self.as_json())
 		if self._id is not None and doc_id != self._id:
 			raise Exception("Failed to save document, id doesn't match, is '{}', should be '{}'".format(doc_id, self._id))
 		self._id = doc_id
