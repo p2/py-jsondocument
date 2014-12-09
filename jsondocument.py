@@ -6,14 +6,10 @@
 #	2014-02-05	Created by Pascal Pfiffner
 #
 
-import sys
-import os.path
-sys.path.insert(0, os.path.dirname(__file__))
-
 import uuid
 import logging
 
-from jsondocument.jsonserver import JSONServer
+import jsonserver
 
 
 class JSONDocument(object):
@@ -110,7 +106,7 @@ class JSONDocument(object):
 		if cls.server is None and jsonsrv is None:
 			raise Exception('Need a JSONServer instance')
 		if jsonsrv is not None:
-			if not isinstance(jsonsrv, JSONServer):
+			if not isinstance(jsonsrv, jsonserver.JSONServer):
 				raise Exception('Need a JSONServer instance but got {} > {}'.format(jsonsrv, jsonsrv.__class__.__bases__))
 			cls.server = jsonsrv
 		
