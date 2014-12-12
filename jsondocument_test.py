@@ -67,7 +67,7 @@ class TestJSONDocument(unittest.TestCase):
 
 
 class MockServer(jsonsrv.JSONServer):
-	def storeDocument(self, bucket, document):
+	def store_document(self, bucket, document):
 		return document['_id']
 	
 	def find(self, bucket, dict):
