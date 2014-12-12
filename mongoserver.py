@@ -9,7 +9,7 @@ import os
 
 from pymongo import MongoClient
 from bson.objectid import ObjectId 
-from jsondocument import jsonserver
+import jsonserver
 
 
 class MongoServer(jsonserver.JSONServer):

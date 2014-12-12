@@ -108,7 +108,7 @@ class JSONDocument(object):
             raise Exception('Need a JSONServer instance')
         if jsonsrv is not None:
             if not isinstance(jsonsrv, jsonserver.JSONServer):
-                raise Exception('Need a JSONServer instance but got {} > {}'.format(jsonsrv, jsonsrv.__class__.__bases__))
+                raise Exception('Need a JSONServer instance but got {} with bases {}'.format(jsonsrv, jsonsrv.__class__.__bases__))
             cls.server = jsonsrv
         
         if bucket is not None and len(bucket) > 0:
