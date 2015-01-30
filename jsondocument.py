@@ -73,8 +73,8 @@ class JSONDocument(object):
     
     def for_api(self):
         """ Return the whole OR PARTS OF the receiver, as JSON, to be consumed
-        by an API. """
-        return self.__dict__
+        by an API. Forwards to `as_json()`. """
+        return self.as_json()
     
     def __html__(self):
         """ For compatibility with other libraries, forwards to `for_api()`.
