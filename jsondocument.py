@@ -52,8 +52,7 @@ class JSONDocument(object):
             if 'id' in json:
                 del json['id']
             
-            for key, val in json.items():
-                setattr(self, key, val)
+            self.update_with(json)
         
         # set document type
         if doctype is not None:
@@ -69,12 +68,24 @@ class JSONDocument(object):
     
     def as_json(self):
         """ Return the whole document ready to be JSONified. """
-        return self.__dict__
+        js = self.__dict__.copy()
+        for key, val in js.items():
+            if isinstance(val, list):
+                js[key] = [j.as_json() if isinstance(j, JSONDocument) else j for j in val]
+            elif isinstance(val, JSONDocument):
+                js[key] = val.as_json()
+        return js
     
     def for_api(self):
         """ Return the whole OR PARTS OF the receiver, as JSON, to be consumed
         by an API. Forwards to `as_json()`. """
-        return self.as_json()
+        js = self.__dict__.copy()
+        for key, val in js.items():
+            if isinstance(val, list):
+                js[key] = [j.for_api() if isinstance(j, JSONDocument) else j for j in val]
+            elif isinstance(val, JSONDocument):
+                js[key] = val.for_api()
+        return js
     
     def __html__(self):
         """ For compatibility with other libraries, forwards to `for_api()`.
