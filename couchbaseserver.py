@@ -6,7 +6,11 @@
 #   2014-03-25  Created by Pascal Pfiffner
 
 from couchbase import Couchbase
-from jsondocument import jsonserver
+
+if __package__:
+    from .jsondocument import jsonserver
+else:
+    from jsondocument import jsonserver
 
 
 class CouchbaseServer(jsonserver.JSONServer):

@@ -9,10 +9,13 @@ import os
 
 from pymongo import MongoClient
 from bson.objectid import ObjectId 
-import jsonserver
+if __package__:
+    from .jsonserver import JSONServer
+else:
+    from jsonserver import JSONServer
 
 
-class MongoServer(jsonserver.JSONServer):
+class MongoServer(JSONServer):
     """ A MongoDB server.
     
     This class will make sure that a document's **_id** is an ``ObjectId`` if

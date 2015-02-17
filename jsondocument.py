@@ -9,7 +9,10 @@
 import uuid
 import logging
 
-import jsonserver
+if __package__:
+    from .jsonserver import JSONServer
+else:
+    from jsonserver import JSONServer
 
 
 class JSONDocument(object):
@@ -118,7 +121,7 @@ class JSONDocument(object):
         if cls.server is None and jsonsrv is None:
             raise Exception('Need a JSONServer instance')
         if jsonsrv is not None:
-            if not isinstance(jsonsrv, jsonserver.JSONServer):
+            if not isinstance(jsonsrv, JSONServer):
                 raise Exception('Need a JSONServer instance but got {} with bases {}'.format(jsonsrv, jsonsrv.__class__.__bases__))
             cls.server = jsonsrv
         
