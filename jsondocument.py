@@ -102,7 +102,7 @@ class JSONDocument(object):
     @classmethod
     def assure_class_has_server(cls):
         if cls.server is None:
-            raise Exception("I don't yet have a handle to the server in {}".format(cls))
+            raise Exception("I don't yet have a handle to the server in {}. Use `Class.hookup(JSONServer-instance)`.".format(cls))
         if cls.use_bucket is None:
             raise Exception("I don't yet have a bucket to use for class {}".format(cls))
         return cls.server
@@ -191,8 +191,10 @@ class JSONDocument(object):
         """
         srv = cls.assure_class_has_server()
         found = []
-        for doc in srv.find(cls.use_bucket, dic):
-            found.append(cls(None, json=doc))
+        docs_found = srv.find(cls.use_bucket, dic)
+        if docs_found is not None:
+            for doc in docs_found:
+                found.append(cls(None, json=doc))
         
         return found
 
