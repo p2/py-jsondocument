@@ -10,25 +10,6 @@ class JSONServer(object):
     """ Abstract superclass for NoSQL-style servers.
     """
     
-    def __init__(self):
-        self.conn = None
-        self.handles = {}
-    
-    def handle(self, bucket=None):
-        """ Returns the handle to the given bucket.
-        """
-        if self.conn is None:
-            raise Exception('Server connection is not set up')
-        if not bucket:
-            bucket = 'default'
-        if bucket not in self.handles:
-            handle = self.conn[bucket]
-            if handle is not None:
-                self.handles[bucket] = handle
-        
-        return self.handles[bucket]
-    
-    
     def load_document(self, bucket, doc_id):
         """ Load an individual document.
         

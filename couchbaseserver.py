@@ -4,35 +4,28 @@
 #   A Couchbase server handle to be used with JSONDocument subclasses
 #
 #   2014-03-25  Created by Pascal Pfiffner
+#   2016-02-19  Start renovating
 
-from couchbase import Couchbase
+import couchbase.bucket
 
-if __package__:
-    from .jsondocument import jsonserver
-else:
-    from jsondocument import jsonserver
+from jsondocument import jsonserver
 
 
 class CouchbaseServer(jsonserver.JSONServer):
     """ A Couchbase server.
-    
-    :todo: Re-implement!
     """
     
-    def __init__(self, bucket=None):
+    def __init__(self, couch_url):
         super().__init__()
-        self.bucket = bucket
-        self.handle = Couchbase.connect(bucket=bucket)
+        self.bucket = couchbase.bucket.Bucket(couch_url)
     
     def store_document(self, bucket, document):
-        """ TODO: MAKE IT WORK. """
-        self.handle(bucket)
-        self.handle.set(document.get('_id'), document)
-        return None
+        """ Inserts or updates the document.
+        """
+        ident = document['_id']
+        self.bucket.upsert(ident, document)
+        return ident
     
     def find(self, bucket, dictionary):
-        """ TODO: needs a view name! Not working! Old! BAAAAAH!
-        """
-        self.handle(bucket)
-        return self.handle.query(self.bucket, view_name, key=dictionary)
+        raise Exception('Not implemented')
 

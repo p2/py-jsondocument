@@ -174,6 +174,14 @@ class JSONDocument(object):
             raise Exception("Failed to save document, id doesn't match, is '{}', should be '{}'".format(doc_id, self._id))
         self._id = doc_id
     
+    def store_to(self, server):
+        """ Store the document to the given server.
+        """
+        doc_id = server.store_document(self.bucket, self.as_json())
+        if self._id is not None and doc_id != self._id:
+            raise Exception("Failed to save document, id doesn't match, is '{}', should be '{}'".format(doc_id, self._id))
+        self._id = doc_id
+    
     def remove(self):
         """ Deletes the document.
         """
