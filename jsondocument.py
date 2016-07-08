@@ -199,7 +199,7 @@ class JSONDocument(object):
         """ Store the document to the given server.
         """
         doc_id = server.store_document(bucket, self.as_json())
-        if self._id is not None and doc_id != self._id:
+        if self._id is not None and str(doc_id) != str(self._id):
             raise Exception("Failed to save document, id doesn't match, is '{}', should be '{}'".format(doc_id, self._id))
         self._id = doc_id
     
