@@ -18,8 +18,12 @@ else:
 class JSONDocument(object):
     """ Base class for documents living in a NoSQL database.
     
-    Can be hooked up to JSONServer subclasses, which can represent a MongoDB or
-    Couchbase server, or can be simple file or memory "databases".
+    All CRUD methods have two versions, one where you specify the server and
+    one where you rely on the document class being hooked up to a server
+    already.
+    
+    Currently supported servers are MongoDB or Couchbase, or can be simple file
+    or memory "databases".
     """
     
     server = None
@@ -81,7 +85,7 @@ class JSONDocument(object):
     
     def for_api(self):
         """ Return the whole OR PARTS OF the receiver, as JSON, to be consumed
-        by an API. Forwards to `as_json()`. """
+        by an API. """
         js = self.__dict__.copy()
         for key, val in js.items():
             if isinstance(val, list):
@@ -98,7 +102,8 @@ class JSONDocument(object):
         return self.for_api()
     
     
-    # -------------------------------------------------------------------------- Server
+    # MARK: - Server
+    
     @classmethod
     def assure_class_has_server(cls):
         if cls.server is None:
@@ -128,20 +133,27 @@ class JSONDocument(object):
         if bucket is not None and len(bucket) > 0:
             cls.use_bucket = bucket
     
-    @property
-    def bucket(self):
-        return self.__class__.use_bucket
+    
+    # MARK: - CRUD Operations
     
     def load(self):
         """ Loads the receiver's contents from database and applies the
         document's contents.
         """
+        srv = self.assure_has_server()
+        self.load_from(srv, self.__class__.use_bucket)
+    
+    def load_from(self, server, bucket=None):
+        """ Loads the receiver's contents from the given server/database and
+        applies the document's contents.
+        """
+        assert server
         if self.id is None:
             raise Exception('Need to have an id to load contents')
         
-        srv = self.assure_has_server()
-        doc = srv.load_document(self.bucket, self.id)
+        doc = server.load_document(bucket, self.id)
         self.update_with(doc)
+        
     
     def update_with(self, doc):
         """ Update the receiver's contents with the supplied document (dict).
@@ -163,21 +175,30 @@ class JSONDocument(object):
         :todo: This does NOT YET update each document's document id!!
         """
         srv = cls.assure_class_has_server()
-        doc_ids = srv.add_documents(cls.use_bucket, documents)
+        cls.insert_to(documents, srv, cls.use_bucket)
+    
+    @classmethod
+    def insert_to(cls, documents, server, bucket=None):
+        """ Insert one or more documents. Forwards to the specific
+        implementation of the underlying NoSQL database.
+        
+        :param documents: Can be a single document/dictionary or a list thereof
+        :param server:    The server to insert to
+        
+        :todo: This does NOT YET update each document's document id!!
+        """
+        doc_ids = server.add_documents(bucket, documents)
     
     def store(self):
         """ Store the document.
         """
         srv = self.assure_has_server()
-        doc_id = srv.store_document(self.bucket, self.as_json())
-        if self._id is not None and doc_id != self._id:
-            raise Exception("Failed to save document, id doesn't match, is '{}', should be '{}'".format(doc_id, self._id))
-        self._id = doc_id
+        self.store_to(srv, self.__class__.use_bucket)
     
-    def store_to(self, server):
+    def store_to(self, server, bucket=None):
         """ Store the document to the given server.
         """
-        doc_id = server.store_document(self.bucket, self.as_json())
+        doc_id = server.store_document(bucket, self.as_json())
         if self._id is not None and doc_id != self._id:
             raise Exception("Failed to save document, id doesn't match, is '{}', should be '{}'".format(doc_id, self._id))
         self._id = doc_id
@@ -186,7 +207,12 @@ class JSONDocument(object):
         """ Deletes the document.
         """
         srv = self.assure_has_server()
-        srv.remove_document(self.bucket, self._id)
+        self.remove_from(srv, self.__class__.use_bucket)
+    
+    def remove_from(self, server, bucket=None):
+        """ Deletes the document from the given server.
+        """
+        server.remove_document(bucket, self._id)
     
     @classmethod
     def find(cls, dic):
@@ -198,8 +224,21 @@ class JSONDocument(object):
             matching the search criteria
         """
         srv = cls.assure_class_has_server()
+        cls.find_on(dic, srv, cls.use_bucket)
+    
+    @classmethod
+    def find_on(cls, dic, server, bucket=None):
+        """ Finds the documents identified by the supplied dictionary and
+        instantiates documents of the receiver class, returning a list.
+        
+        :param dict dic: A dictionary containing the query
+        :param JSONServer server: The server to use
+        :param str bucket: The bucket/collection to search in
+        :returns: A list of instances of the receiver class with documents
+            matching the search criteria
+        """
         found = []
-        docs_found = srv.find(cls.use_bucket, dic)
+        docs_found = server.find(bucket, dic)
         if docs_found is not None:
             for doc in docs_found:
                 found.append(cls(None, json=doc))
