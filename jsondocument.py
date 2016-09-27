@@ -83,10 +83,18 @@ class JSONDocument(object):
                 js[key] = val.as_json()
         return js
     
-    def for_api(self):
+    def for_api(self, omit=None):
         """ Return the whole OR PARTS OF the receiver, as JSON, to be consumed
-        by an API. """
+        by an API.
+        
+        :param omit: List or set of key names to omit from the JSON; mostly
+            used by superclasses
+        """
         js = self.__dict__.copy()
+        if omit is not None:
+            for key in omit:
+                if key in js:
+                    del js[key]
         for key, val in js.items():
             if isinstance(val, list):
                 js[key] = [j.for_api() if isinstance(j, JSONDocument) else j for j in val]
@@ -196,11 +204,14 @@ class JSONDocument(object):
         self.store_to(srv, self.__class__.use_bucket)
     
     def store_to(self, server, bucket=None):
-        """ Store the document to the given server.
+        """ Store the document to the given server. Ensures that the document's
+        `id` or `_id` does not change.
+        
+        :param server: The server to insert to
         """
         doc_id = server.store_document(bucket, self.as_json())
         if self._id is not None and str(doc_id) != str(self._id):
-            raise Exception("Failed to save document, id doesn't match, is '{}', should be '{}'".format(doc_id, self._id))
+            raise Exception("Failed to save document, `id` doesn't match, is \"{}\", should be \"{}\"".format(doc_id, self._id))
         self._id = doc_id
     
     def remove(self):
