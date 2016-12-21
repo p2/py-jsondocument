@@ -238,7 +238,7 @@ class JSONDocument(object):
         cls.find_on(dic, srv, cls.use_bucket)
     
     @classmethod
-    def find_on(cls, dic, server, bucket=None):
+    def find_on(cls, dic, server, bucket=None, skip=0, limit=50, sort=None, descending=False):
         """ Finds the documents identified by the supplied dictionary and
         instantiates documents of the receiver class, returning a list.
         
@@ -249,7 +249,7 @@ class JSONDocument(object):
             matching the search criteria
         """
         found = []
-        docs_found = server.find(bucket, dic)
+        docs_found = server.find(bucket, dic, skip, limit, sort, descending)
         if docs_found is not None:
             for doc in docs_found:
                 found.append(cls(None, json=doc))

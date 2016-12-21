@@ -7,7 +7,7 @@
 
 import os
 
-from pymongo import MongoClient
+import pymongo
 from bson.objectid import ObjectId 
 if __package__:
     from .jsonserver import JSONServer
@@ -31,7 +31,7 @@ class MongoServer(JSONServer):
         if port is None:
             port = int(os.environ.get('MONGO_PORT') or 27017)
         
-        conn = MongoClient(host=host, port=port)
+        conn = pymongo.MongoClient(host=host, port=port)
         
         # select database
         if database is None:
@@ -96,7 +96,10 @@ class MongoServer(JSONServer):
         handle = self.handle(bucket)
         handle.remove(spec_or_id=doc_id)
     
-    def find(self, bucket, dictionary):
+    def find(self, bucket, dictionary, skip=0, limit=50, sort=None, descending=False):
         handle = self.handle(bucket)
-        return handle.find(dictionary)
+        if sort is not None:
+            order = pymongo.DESCENDING if descending else pymongo.ASCENDING
+            return handle.find(dictionary).sort(sort, order).skip(skip).limit(limit)
+        return handle.find(dictionary).skip(skip).limit(limit)
 
